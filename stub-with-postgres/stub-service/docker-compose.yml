@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  stub-app:
+    build:
+      context: .
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    networks:
+      - postgres_service_postgres-net
+
+networks:
+  postgres_service_postgres-net:
+    external: true
