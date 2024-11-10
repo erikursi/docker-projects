@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   stub-app:
+    container_name: stub-app
     build:
       context: .
     ports:

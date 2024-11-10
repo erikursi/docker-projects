@@ -7,3 +7,6 @@
 
 ## Run kafka_service
 `cd kafka_service && docker compose up -d`
+
+## Run prometheus_service
+`cd prometheus_service && docker compose up -d`

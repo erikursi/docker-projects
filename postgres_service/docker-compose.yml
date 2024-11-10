@@ -2,6 +2,7 @@ version: '3.7'
 services:
   postgres:
     image: postgres
+    container_name: postgres
     volumes:
       - postgres-data:/var/lib/postgres/data
       - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
@@ -16,6 +17,22 @@ services:
     command: ["postgres", "-p", "5433"]
     networks:
       - postgres-net
+
+  postgres-exporter:
+    container_name: postgres-exporter
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    environment:
+      DATA_SOURCE_URI: "postgres:5433/my_db?sslmode=disable"
+      DATA_SOURCE_USER: admin
+      DATA_SOURCE_PASS: admin
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - postgres-net
+
 volumes:
   postgres-data:
 networks:
