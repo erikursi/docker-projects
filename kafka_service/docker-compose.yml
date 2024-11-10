@@ -1,42 +1,36 @@
-version: '3.7'
+
 services:
   kafka:
     container_name: kafka
     image: bitnami/kafka
     ports:
       - "9092:9092"
+      - "7071:7071"
     environment:
+      KAFKA_CFG_BROKER_ID: 0
       KAFKA_CFG_NODE_ID: 0
       KAFKA_CFG_PROCESS_ROLES: controller,broker
       KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
       KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
       KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-#      KAFKA_OPTS: -javaagent:"$PWD/kafka/jmx_prometheus_javaagent-0.6.jar"
-#    volumes:
- #     - ./kafka/jmx_prometheus_javaagent-0.6.jar:/app/jmx_agent.jar
+      KAFKA_OPTS: -javaagent:/opt/jmx_exporter/jmx_agent.jar=7071:/etc/jmx_exporter/jmx_config.yml
+    volumes:
+      - ./kafka/jmx_prometheus_javaagent-0.6.jar:/opt/jmx_exporter/jmx_agent.jar
+      - ./kafka/jmx_config.yml:/etc/jmx_exporter/jmx_config.yml
     networks:
       - postgres_service_postgres-net
-
-#  jmx-exporter:
-#    container_name: jmx-exporter
-#    image: bitnami/jmx-exporter
-#    ports:
-#      - "5556:5556"
-#    environment:
-#      KAFKA_SERVER: kafka:9092
-#    networks:
-#      - postgres_service_postgres-net
 
   kafka-exporter:
     build: kafka-exporter
     entrypoint: ["run.sh"]
     container_name: kafka-exporter
-    image: bitnami/kafka-exporter
     ports:
       - "9308:9308"
     networks:
       - postgres_service_postgres-net
+    command:
+      - --kafka.server=kafka:9092
 
 networks:
   postgres_service_postgres-net:
