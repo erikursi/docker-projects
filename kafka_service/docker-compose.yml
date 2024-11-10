@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - postgres_service_postgres-net
+
+
+
+  jmx_exporter:
+    image: jmxfetch/jmx_exporter
+    ports:
+      - "5556:5556"
+    environment:
+      KAFKA_SERVER: kafka:9092
+    networks:
+      - postgres_service_postgres-net
+
+
+  kafka_exporter:
+    image: danielqsfl/kafka-exporter
+    ports:
+      - "9308:9308"
+    environment:
+      KAFKA_SERVER: kafka:9092
+    networks:
+      - postgres_service_postgres-net
+
+networks:
+  postgres_service_postgres-net:
+    external: true
