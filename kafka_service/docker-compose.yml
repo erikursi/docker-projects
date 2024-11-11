@@ -22,7 +22,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENERS: PLAINTEXT://:9092
       KAFKA_BROKER_ID: 1
-      EXTRA_ARGS: -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-0.6.jar=5556:/opt/jmx_exporter/jmx_config.yml
+      EXTRA_ARGS: -javaagent:/opt/jmx_exporter/jmx_prometheus_javaagent-1.0.1.jar=5556:/opt/jmx_exporter/kafka-2_0_0.yml
     depends_on:
       - zookeeper
     volumes:
@@ -31,7 +31,7 @@ services:
       - postgres_service_postgres-net
 
   kafka-exporter:
-    image: bitnami/kafka-exporter
+    image: danielqsj/kafka-exporter
     container_name: kafka-exporter
     ports:
       - "9308:9308"
