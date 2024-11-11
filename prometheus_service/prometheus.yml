@@ -19,7 +19,7 @@ scrape_configs:
     scrape_timeout: 5s
     metrics_path: /metrics
     static_configs:
-      - targets: ['jmx-exporter:7071']
+      - targets: ['kafka:5556']
   - job_name: kafka_exporter_job
     scrape_interval: 10s
     scrape_timeout: 5s
