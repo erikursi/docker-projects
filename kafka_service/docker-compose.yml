@@ -1,26 +1,40 @@
 
 services:
-  kafka:
-    container_name: kafka
-    image: bitnami/kafka
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
     ports:
-      - "9092:9092"
-      - "7071:7071"
-    environment:
-      KAFKA_CFG_BROKER_ID: 0
-      KAFKA_CFG_NODE_ID: 0
-      KAFKA_CFG_PROCESS_ROLES: controller,broker
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
-      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_OPTS: -javaagent:/opt/jmx_exporter/jmx_agent.jar=7071:/etc/jmx_exporter/jmx_config.yml
-    volumes:
-      - ./kafka/jmx_prometheus_javaagent-0.6.jar:/opt/jmx_exporter/jmx_agent.jar
-      - ./kafka/jmx_config.yml:/etc/jmx_exporter/jmx_config.yml
+      - "2181:2181"
     networks:
       - postgres_service_postgres-net
 
+  kafka:
+    container_name: kafka
+#    image: bitnami/kafka
+    build: kafka
+    ports:
+#      - "9094:9094"
+      - "9092:9092"
+      - "7071:7071"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      #KAFKA_CFG_NODE_ID: 1
+      #KAFKA_CFG_PROCESS_ROLES: controller,broker
+      #KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      #KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://${HOSTNAME:-localhost}:9094
+      #KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      #KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      #KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      #KAFKA_CFG_INNER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OPTS: -javaagent:/opt/jmx_exporter/jmx_agent.jar=7071:/etc/jmx_exporter/jmx_config.yml
+    volumes:
+#      - ./kafka/jmx_prometheus_javaagent-0.6.jar:/opt/jmx_exporter/jmx_agent.jar
+#      - ./kafka/jmx_config.yml:/etc/jmx_exporter/jmx_config.yml
+#      - kafka-data:/bitnami/kafka
+    networks:
+      - postgres_service_postgres-net
   kafka-exporter:
     build: kafka-exporter
     entrypoint: ["run.sh"]
@@ -35,3 +49,5 @@ services:
 networks:
   postgres_service_postgres-net:
     external: true
+# volumes:
+#  kafka-data:
